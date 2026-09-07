@@ -157,7 +157,7 @@
       var diff = target - Date.now();
       if (diff <= 0) {
         sec.classList.add("is-live");
-        $("#count-h").textContent = "יאסו! החגיגה כבר כאן 🎉";
+        $("#count-h").textContent = "יאסו! 40 לדור כבר כאן 🎉";
         $("#countNote").textContent = "נתראה באתונה";
         clearInterval(timer);
         return;

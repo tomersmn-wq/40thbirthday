@@ -23,7 +23,7 @@ window.SITE_CONFIG = {
   // The host, for the WhatsApp quick-buttons.
   // Phone must be digits only, with country code and no leading + or 0.
   host: {
-    name: "דור",
+    name: "דור נצר",
     whatsapp: "9725XXXXXXXX",
   },
 

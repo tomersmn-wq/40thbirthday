@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TAVERNA TAKE OVER — חגיגת 40 באתונה</title>
-<meta name="description" content="יאסו של החיים! חגיגת יום הולדת 40 באתונה, 4–6 בדצמבר. טברנה, מועדון, סיור קולינרי וניקוס ורטיס בשולחן VIP. אשרו הגעה כאן.">
+<title>TAVERNA TAKE OVER — חוגגים 40 לדור נצר באתונה</title>
+<meta name="description" content="חוגגים 40 לדור ביוון — יאסו של החיים! כולם מתייצבים באתונה, 4–6 בדצמבר. טברנה, מועדון, סיור קולינרי וניקוס ורטיס בשולחן VIP.">
 <meta name="theme-color" content="#0D3B66">
 <meta name="color-scheme" content="light">
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="he_IL">
 <meta property="og:site_name" content="TAVERNA TAKE OVER">
-<meta property="og:title" content="TAVERNA TAKE OVER — חגיגת 40 באתונה">
-<meta property="og:description" content="יאסו של החיים! 4–6 בדצמבר באתונה. טברנה, מועדון, סיור קולינרי וורטיס VIP. אשרו הגעה 🇬🇷">
+<meta property="og:title" content="TAVERNA TAKE OVER — חוגגים 40 לדור נצר באתונה">
+<meta property="og:description" content="יאסו של החיים! כולם מתייצבים באתונה ל־40 של דור, 4–6 בדצמבר. טברנה, מועדון, סיור קולינרי וורטיס VIP 🇬🇷">
 <!-- Add assets/og.jpg (1200x630) and uncomment for rich WhatsApp previews:
 <meta property="og:image" content="assets/og.jpg">
 <meta name="twitter:image" content="assets/og.jpg">
@@ -58,6 +58,11 @@
   <symbol id="i-whatsapp" viewBox="0 0 24 24">
     <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.02c-.24.68-1.4 1.3-1.93 1.35-.53.06-1.02.08-1.76-.11-.44-.11-1.02-.3-1.76-.62-3.1-1.34-5.13-4.46-5.29-4.67-.15-.21-1.26-1.67-1.26-3.19 0-1.51.79-2.26 1.07-2.57.28-.3.61-.38.82-.38.2 0 .41 0 .59.01.19.01.44-.07.69.53.24.6.83 2.02.9 2.17.08.15.13.32.03.53-.1.2-.36.53-.55.75-.13.15-.28.27-.11.55.16.28.72 1.24 1.55 2 1.06.98 1.83 1.26 2.11 1.4.21.11.43.09.6-.07.19-.19.62-.7.79-.94.17-.24.34-.2.57-.11.23.08 1.5.75 1.76.89.25.13.42.2.48.31.06.11.06.66-.18 1.34Z"/>
   </symbol>
+  <symbol id="i-clip" viewBox="0 0 28 36">
+    <path fill="currentColor" d="M8.2 2.2h11.6l4.6 11.2H3.6L8.2 2.2z"/>
+    <path fill="#F7F0D4" d="M6.8 12.6h14.4v4.2H6.8z"/>
+    <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M10 17v14.5M18 17v14.5"/>
+  </symbol>
 </svg>
 
 <!-- ── setup banner (only shows while config.js has placeholders) ───── -->
@@ -74,10 +79,12 @@
   <div class="topbar__in">
     <a class="brand" href="#top">
       <span class="brand__flag" aria-hidden="true">🇬🇷</span>
-      <span class="brand__txt"><b dir="ltr">TAVERNA</b><i>חגיגת 40</i></span>
+      <span class="brand__txt"><b dir="ltr">TAVERNA</b><i>40 לדור</i></span>
     </a>
     <nav class="nav" aria-label="ניווט באתר">
+      <a href="#letter">מדור</a>
       <a href="#itinerary">לו״ז</a>
+      <a href="#how">איך זה עובד</a>
       <a href="#rsvp">אישור הגעה</a>
       <a href="#gallery">גלריה</a>
       <a href="#faq">טיפים</a>
@@ -111,16 +118,25 @@
     <svg class="deco deco--flower2" aria-hidden="true"><use href="#i-bougainvillea"/></svg>
     <svg class="deco deco--ouzo" aria-hidden="true"><use href="#i-ouzo"/></svg>
 
+    <figure class="snap snap--alley" aria-hidden="true">
+      <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+      <img src="assets/hero-alley.jpg" alt="" width="512" height="1024">
+    </figure>
+    <figure class="snap snap--suit" aria-hidden="true">
+      <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+      <img src="assets/hero-suit.jpg" alt="" width="1024" height="682">
+    </figure>
+
     <div class="hero__in">
       <p class="hero__eyebrow">יאסו! <span dir="ltr">ΑΘΗΝΑ</span> · אתונה, יוון</p>
 
       <h1 class="hero__title">
         <span class="hero__t1" dir="ltr">TAVERNA</span>
         <span class="hero__t2" dir="ltr">TAKE OVER</span>
-        <span class="hero__t3" dir="ltr">40<sup>th</sup> BIRTHDAY IN ATHENS</span>
+        <span class="hero__t3" dir="ltr">DOR NETZER · 40<sup>th</sup> IN ATHENS</span>
       </h1>
 
-      <p class="hero__sub">יאסו של החיים! כולם מגיעים — חגיגת 40 ביוון!</p>
+      <p class="hero__sub">חוגגים 40 לדור ביוון — יאסו של החיים! כולם מתייצבים באתונה!</p>
 
       <p class="badge-dates">
         <span dir="ltr">DECEMBER 4–6</span>
@@ -148,12 +164,50 @@
     <p class="count__note" id="countNote">עד ארוחת הערב בטברנה · שישי <span dir="ltr">4.12</span> בשעה <span dir="ltr">21:00</span> (שעון אתונה)</p>
   </section>
 
+  <!-- ── letter from Dor ───────────────────────────────────────────── -->
+  <section class="sec sec--letter" id="letter" aria-labelledby="letter-h">
+    <article class="letter reveal">
+      <div class="card__cloth card__cloth--gold" aria-hidden="true"></div>
+      <figure class="snap snap--teal" aria-hidden="true">
+        <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+        <img src="assets/deco-teal.jpg" alt="" width="682" height="1024">
+      </figure>
+      <div class="letter__in">
+        <p class="kicker">מילה אישית מחתן השמחה</p>
+        <h2 class="letter__h" id="letter-h">יומולדת 40 באתונה 🇬🇷</h2>
+
+        <p>שמעו… 40. לא יודע מה להגיד על זה. בלתי נתפס מבחינתי.</p>
+        <p>מה שאני כן יודע — הוא שלאור העובדה שהחיים טסים במהירות שיא, צריך לנצל כל סיבה למסיבה.</p>
+        <p>וציון 40 חורפים מבחינתי, מבלי שקיפדתי את פתיל חיי ו/או ביליתי מאחורי סורג ובריח, הם הישג עצום שמצדיק להעיף פה יאסו באוויר!</p>
+        <p>אבא אוהב יוון, וזה נראה לי מתאים כמו כפפה למאורע.</p>
+
+        <ul class="letter__likes">
+          <li>קצת טברנה אסלית עם אוזו שניגר</li>
+          <li>קצת בלאגן במועדון</li>
+          <li>קצת כדורסל יורוליג משובח באולם עוין באתונה</li>
+          <li>הופעה של ניקוס ורטיס האגדי, הלוא הוא אייל גולן המקומי <i>(רק לא טורף קטינות למחייתו)</i></li>
+          <li>קצת קולינריה של יוון…</li>
+        </ul>
+
+        <p class="letter__heart">דברים שאני אוהב. עם אנשים שאני אוהב. שזה אתם.<br>מדויק לי.</p>
+        <p>יאללה בואו להטיס יאסאס של החיים.</p>
+
+        <p class="letter__sign">
+          <span>שלכם,</span>
+          <b>דור נצר</b>
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <div class="meander" aria-hidden="true"></div>
+
   <!-- ── itinerary ─────────────────────────────────────────────────── -->
   <section class="sec sec--itinerary" id="itinerary" aria-labelledby="itin-h">
     <div class="sec__head reveal">
       <p class="kicker">לוח הזמנים</p>
       <h2 class="sec__h" id="itin-h">שלושה ימים, אפס שפיות</h2>
-      <p class="sec__lede">כל מה שמתוכנן — משעת הנחיתה ועד הבראנץ׳ של הפרידה. אין חובה להגיע להכל, אבל למה לא?</p>
+      <p class="sec__lede">התפריט של דור: טברנה אסלית, בלאגן במועדון, יורוליג באולם עוין, ורטיס וקולינריה יוונית. אין חובה להגיע להכל, אבל למה לא?</p>
     </div>
 
     <ol class="timeline">
@@ -172,7 +226,7 @@
               <span class="time" dir="ltr">20:15</span>
               <div>
                 <h4>משחק יורוליג גיהינום</h4>
-                <p>אווירה שאין בשום מקום אחר בעולם — אבוקות, תופים ו־20,000 יוונים שצורחים. מי שמגיע ביום חמישי, זה הפתיח.</p>
+                <p>כדורסל יורוליג משובח באולם עוין — אבוקות, תופים ו־20,000 יוונים שצורחים. מי שמגיע ביום חמישי, זה הפתיח.</p>
               </div>
             </li>
           </ul>
@@ -183,6 +237,10 @@
         <span class="tl-dot" aria-hidden="true">1</span>
         <article class="card">
           <div class="card__cloth" aria-hidden="true"></div>
+          <figure class="snap snap--shot" aria-hidden="true">
+            <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+            <img src="assets/deco-shot.jpg" alt="" width="1024" height="682">
+          </figure>
           <header class="card__head">
             <p class="card__day">שישי · <span dir="ltr">4.12</span></p>
             <h3 class="card__title">יום הפתיחה והבלאגן!</h3>
@@ -218,6 +276,10 @@
         <span class="tl-dot" aria-hidden="true">2</span>
         <article class="card">
           <div class="card__cloth card__cloth--olive" aria-hidden="true"></div>
+          <figure class="snap snap--dance" aria-hidden="true">
+            <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+            <img src="assets/deco-dance.jpg" alt="" width="1024" height="682">
+          </figure>
           <header class="card__head">
             <p class="card__day">שבת · <span dir="ltr">5.12</span></p>
             <h3 class="card__title">תרבות, אוכל וורטיס <span dir="ltr">VIP</span></h3>
@@ -242,7 +304,7 @@
               <span class="time" dir="ltr">20:00</span>
               <div>
                 <h4>ניקוס ורטיס בהופעה — שולחן <span dir="ltr">VIP</span></h4>
-                <p>ההופעה שכולנו מחכים לה, ומהשולחן הטוב בבית. פרחים, שמפניה ולהתחרפן על השולחן — כמו שצריך.</p>
+                <p>האגדה. האייל גולן של אתונה. מהשולחן הטוב בבית — פרחים, שמפניה ולהתחרפן על השולחן כמו שצריך.</p>
               </div>
             </li>
           </ul>
@@ -288,21 +350,92 @@
 
   <div class="meander" aria-hidden="true"></div>
 
+  <!-- ── how it works ──────────────────────────────────────────────── -->
+  <section class="sec sec--how" id="how" aria-labelledby="how-h">
+    <article class="how reveal">
+      <div class="card__cloth card__cloth--olive" aria-hidden="true"></div>
+      <figure class="snap snap--woods" aria-hidden="true">
+        <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+        <img src="assets/deco-woods.jpg" alt="" width="768" height="1024">
+      </figure>
+      <div class="how__in">
+        <p class="kicker">הלוגיסטיקה</p>
+        <h2 class="how__h" id="how-h">איך זה הולך לעבוד?</h2>
+
+        <p class="how__lead">אתם וודאי שואלים את עצמכם — ״איך זה הולך לעבוד לעזאזל!?״<br>אז חלאס להיות אבודים בחלל. תתאפסו על עצמכם.</p>
+
+        <ol class="how__steps">
+          <li>
+            <span class="how__n" aria-hidden="true">1</span>
+            <div>
+              <h3>מפיק מקומי</h3>
+              <p>אנחנו משקיעים פה בעבודה עם מפיק מקומי שיסייע להרים את האירוע.</p>
+            </div>
+          </li>
+          <li>
+            <span class="how__n" aria-hidden="true">2</span>
+            <div>
+              <h3>הטברנה והסיור — עלינו</h3>
+              <p>מתוך הלו״ז המוצע — הטברנה עלינו, כמו גם הסיור הקולינרי 🙂</p>
+            </div>
+          </li>
+          <li>
+            <span class="how__n" aria-hidden="true">3</span>
+            <div>
+              <h3>מלון לקבוצה</h3>
+              <p>אחרי שנבין כמויות מדויקות של אורחים — נעבוד לסגור מלון במחיר טוב לקבוצה גדולה, כדי שתקבלו מחיר נעים. תעמוד לכם הבחירה האם לישון בו או לסגור משהו עצמאי.</p>
+            </div>
+          </li>
+          <li>
+            <span class="how__n" aria-hidden="true">4</span>
+            <div>
+              <h3>טיסות</h3>
+              <p>אותו דבר לגבי הטיסה (יותר מורכב).</p>
+            </div>
+          </li>
+          <li>
+            <span class="how__n" aria-hidden="true">5</span>
+            <div>
+              <h3>דרבי יורוליג באתונה</h3>
+              <p>אני במקביל מנהל מגעים להשיג כרטיסים (נדירים!) לדרבי של אתונה ביורוליג. מחיר משוער: <b dir="ltr">200–300€</b> לגרון. נא <a href="#rsvp">לעדכן אותי בטופס</a> האם מעוניינים להצטרף.</p>
+            </div>
+          </li>
+          <li>
+            <span class="how__n" aria-hidden="true">6</span>
+            <div>
+              <h3>ניקוס ורטיס</h3>
+              <p>עלויות של ההופעה של ניקוס — <span class="how__tba" dir="ltr">XXX</span></p>
+            </div>
+          </li>
+        </ol>
+
+        <p class="how__close">זהו. לא מורכב נכון?</p>
+        <p class="how__yaso-he">יאסוווווו</p>
+      </div>
+    </article>
+  </section>
+
+  <div class="meander" aria-hidden="true"></div>
+
   <!-- ── RSVP ──────────────────────────────────────────────────────── -->
   <section class="sec sec--rsvp" id="rsvp" aria-labelledby="rsvp-h">
     <div class="sec__head reveal">
       <p class="kicker">אישור הגעה</p>
       <h2 class="sec__h" id="rsvp-h">אני בפנים!</h2>
-      <p class="sec__lede">ממלאים פעם אחת ונרשמים לכל החגיגה. שריון מקום בטברנה, בהופעה ובמלון תלוי בטופס הזה — אז אל תדחו את זה לאחר כך.</p>
+      <p class="sec__lede">ממלאים פעם אחת ונרשמים ל־40 של דור. שריון מקום בטברנה, בהופעה ובמלון תלוי בטופס הזה — אז אל תדחו את זה לאחר כך.</p>
     </div>
 
     <div class="formwrap reveal">
       <div class="formwrap__cloth" aria-hidden="true"></div>
+      <figure class="snap snap--couple" aria-hidden="true">
+        <svg class="snap__clip" aria-hidden="true"><use href="#i-clip"/></svg>
+        <img src="assets/deco-couple.jpg" alt="" width="1024" height="682">
+      </figure>
 
       <form id="rsvpForm" class="form" novalidate>
         <input type="hidden" name="photoUrl" id="photoUrl">
         <input type="hidden" name="photoId" id="photoId">
-        <input type="hidden" name="_subject" value="RSVP חדש — TAVERNA TAKE OVER (אתונה 40)">
+        <input type="hidden" name="_subject" value="RSVP חדש — 40 לדור נצר (אתונה)">
         <p class="hp" aria-hidden="true"><label>אל תמלאו את זה<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
 
         <div class="field">
@@ -524,7 +657,7 @@
 <footer class="foot">
   <div class="meander meander--light" aria-hidden="true"></div>
   <p class="foot__t" dir="ltr">TAVERNA TAKE OVER</p>
-  <p class="foot__s">אתונה · <span dir="ltr">4–6.12</span> · חגיגת 40</p>
+  <p class="foot__s">אתונה · <span dir="ltr">4–6.12</span> · חוגגים 40 לדור נצר</p>
   <p class="foot__x">נבנה באהבה, קצת אוזו והרבה בוזוקי <span dir="ltr">🇬🇷</span></p>
 </footer>
 
