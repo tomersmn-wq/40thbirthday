@@ -1,5 +1,6 @@
 # generated review build; regenerate with: node build-single.mjs
 taverna-athens-review.html
+.env
 
 .DS_Store
 Thumbs.db

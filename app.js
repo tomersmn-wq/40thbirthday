@@ -16,10 +16,12 @@
     return typeof v === "string" && v.trim() !== "" && !/^YOUR_/.test(v.trim()) && v.indexOf("XXXX") === -1;
   }
 
-  var WA_DIGITS = String(HOST.whatsapp || "").replace(/\D/g, "");
+  var GF = CFG.googleForm || {};
+  var GF_ENTRIES = GF.entries || {};
+  var PHONE_DIGITS = String(HOST.phone || "").replace(/\D/g, "");
   var HAS_CLOUD = filled(CLD.cloudName) && filled(CLD.uploadPreset);
-  var HAS_FORM = filled((CFG.formspree || {}).formId);
-  var HAS_WA = filled(HOST.whatsapp) && /^\d{8,15}$/.test(WA_DIGITS);
+  var HAS_FORM = filled(GF.action) && filled(GF_ENTRIES.fullName);
+  var HAS_PHONE = filled(HOST.phone) && /^\d{8,15}$/.test(PHONE_DIGITS);
 
   var GAL_TAG = CLD.galleryTag || "athens40";
   var LS_MINE = "athens40:mine";
@@ -39,8 +41,8 @@
   (function setupBanner() {
     var missing = [];
     if (!HAS_CLOUD) missing.push("Cloudinary");
-    if (!HAS_FORM) missing.push("Formspree");
-    if (!HAS_WA) missing.push("WhatsApp");
+    if (!HAS_FORM) missing.push("Google Form");
+    if (!HAS_PHONE) missing.push("טלפון");
     if (!missing.length) return;
 
     var banner = $("#setupBanner");
@@ -58,17 +60,15 @@
   })();
 
   /* ═════════════════════════════════════════════════════════════════
-     2. WhatsApp quick-buttons
+     2. tap-to-call links
      ═════════════════════════════════════════════════════════════════ */
-  $$("[data-wa-msg]").forEach(function (el) {
-    if (HAS_WA) {
-      el.href = "https://wa.me/" + WA_DIGITS + "?text=" + encodeURIComponent(el.getAttribute("data-wa-msg"));
-      el.target = "_blank";
-      el.rel = "noopener noreferrer";
+  $$("[data-call]").forEach(function (el) {
+    if (HAS_PHONE) {
+      el.href = "tel:+" + PHONE_DIGITS;
     } else {
       el.removeAttribute("href");
       el.setAttribute("aria-disabled", "true");
-      el.title = "הוסיפו מספר וואטסאפ ב-config.js";
+      el.title = "הוסיפו מספר טלפון ב-config.js";
     }
   });
 
@@ -648,12 +648,12 @@
   }
 
   /* ═════════════════════════════════════════════════════════════════
-     10. validation + Formspree submit
+     10. validation + Google Form submit
      ═════════════════════════════════════════════════════════════════ */
   var MSG = {
     fullName: { valueMissing: "צריך שם פרטי ושם משפחה" },
     email: { valueMissing: "צריך כתובת אימייל", typeMismatch: "הכתובת לא נראית תקינה" },
-    phone: { valueMissing: "צריך מספר וואטסאפ", tooShort: "המספר קצר מדי" },
+    phone: { valueMissing: "צריך מספר טלפון", tooShort: "המספר קצר מדי" },
     guests: { valueMissing: "בחרו מספר אורחים" },
     euroleague: { valueMissing: "בחרו אחת מהאפשרויות" },
     hotel: { valueMissing: "בחרו אחת מהאפשרויות" }
@@ -765,8 +765,6 @@
     submitTxt.textContent = "שולחים…";
     status("");
 
-    // _gotcha is forwarded on purpose: Formspree needs to see the honeypot
-    // to drop bot submissions
     var payload = {};
     new FormData(form).forEach(function (v, k) {
       payload[k] = typeof v === "string" ? v : String(v);
@@ -776,31 +774,36 @@
     function bad(msg) {
       submitBtn.disabled = false;
       submitTxt.textContent = SUBMIT_LABEL;
-      status(msg || "משהו נתקע. נסו שוב, או שלחו לנו הודעה בוואטסאפ.", true);
+      status(msg || "משהו נתקע. נסו שוב, או התקשרו אלינו.", true);
+    }
+
+    if (payload._gotcha) {
+      setTimeout(ok, 400);
+      return;
     }
 
     if (!HAS_FORM) {
-      console.info("[demo] RSVP would be sent to Formspree:", payload);
+      console.info("[demo] RSVP would be sent to Google Forms:", payload);
       setTimeout(ok, 900);
       return;
     }
 
-    fetch("https://formspree.io/f/" + CFG.formspree.formId, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(payload)
-    }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, body: j }; });
-    }).then(function (res) {
-      if (res.ok) return ok();
-      var msg = "";
-      if (res.body && res.body.errors && res.body.errors.length) {
-        msg = res.body.errors.map(function (x) { return x.message; }).join(", ");
-      }
-      bad(msg);
-    }).catch(function () {
-      bad("נראה שאין חיבור לאינטרנט. נסו שוב בעוד רגע.");
+    var fd = new FormData();
+    Object.keys(GF_ENTRIES).forEach(function (name) {
+      var entry = GF_ENTRIES[name];
+      if (!filled(entry)) return;
+      var val = payload[name];
+      if (val == null) val = "";
+      fd.append("entry." + String(entry).replace(/^entry\./, ""), val);
     });
+
+    // Google does not send CORS headers. mode: 'no-cors' still delivers the
+    // POST, then we treat it as success the same way a hidden-iframe submit would.
+    fetch(GF.action, { method: "POST", mode: "no-cors", body: fd })
+      .then(function () { ok(); })
+      .catch(function () {
+        bad("נראה שאין חיבור לאינטרנט. נסו שוב בעוד רגע.");
+      });
   }
 
   function showDone() {

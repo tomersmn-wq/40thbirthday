@@ -1,30 +1,39 @@
 /* ------------------------------------------------------------------
    TAVERNA TAKE OVER — Athens 40th
-   This is the ONLY file you need to edit to take the site live.
-   Replace every YOUR_… / XXXX placeholder. See README.md for how to
-   get each value. Until then the site runs in a self-contained demo
-   mode so you can review the design.
+   Live config: Cloudinary unsigned uploads, Google Form RSVPs,
+   and the host phone for tap-to-call.
 ------------------------------------------------------------------ */
 
 window.SITE_CONFIG = {
   // Cloudinary — powers the mandatory photo upload and the public gallery.
   // Needs an *unsigned* upload preset, and "Resource list" unrestricted.
   cloudinary: {
-    cloudName: "YOUR_CLOUD_NAME",
-    uploadPreset: "YOUR_UNSIGNED_PRESET",
+    cloudName: "fgxnqd2s",
+    uploadPreset: "athens40_unsigned",
     galleryTag: "athens40",
   },
 
-  // Formspree — receives the RSVP. Just the ID from formspree.io/f/<ID>.
-  formspree: {
-    formId: "YOUR_FORM_ID",
+  // Google Form — RSVPs land in Form responses (and the linked Sheet).
+  // action is the formResponse URL; entries map our field names to entry.IDs.
+  googleForm: {
+    action: "https://docs.google.com/forms/d/e/1FAIpQLSdrUNM17ngTRTVZXyDGgSkQV86nk7vfmZaJJIzyZVW2WOO-sA/formResponse",
+    entries: {
+      fullName: "1357340627",
+      email: "9817593",
+      phone: "943205956",
+      guests: "2094572825",
+      euroleague: "1921205365",
+      hotel: "706770546",
+      notes: "1443597264",
+      photoUrl: "1086197650",
+      photoId: "1382549608",
+    },
   },
 
-  // The host, for the WhatsApp quick-buttons.
-  // Phone must be digits only, with country code and no leading + or 0.
+  // Host contact. Phone is shown as a tap-to-call number, digits with country code.
   host: {
     name: "דור נצר",
-    whatsapp: "9725XXXXXXXX",
+    phone: "+972 50-547-7110",
   },
 
   // Tavern music. A local file in assets/, or any direct audio URL.

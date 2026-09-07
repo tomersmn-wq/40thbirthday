@@ -14,13 +14,10 @@ config.js     ← the only file you need to edit
 assets/       optional music file and OG image
 ```
 
-## It already works before you configure anything
+## Live services
 
-Open the page right now and everything is clickable. The form validates,
-"submits", fires the confetti, and your photo lands in the gallery — it
-just stays in your own browser. A dark banner at the top lists whatever
-is still a placeholder. Once you fill in `config.js` the banner
-disappears and everything points at the real services.
+RSVPs post to a Google Form (and a linked Sheet). Photos upload to
+Cloudinary. Call links use the host number in `config.js`.
 
 ## Sending it to someone for review
 
@@ -41,63 +38,34 @@ intended typography; offline it falls back to system serif and sans.
 The file is generated and gitignored — rerun the command after any edit
 rather than editing it by hand.
 
-## Setup checklist
+## Cloudinary gallery (one Console click)
 
-Everything below is on a free tier and takes about ten minutes.
+Guest uploads already go to cloud `fgxnqd2s` with the unsigned preset
+`athens40_unsigned`. The shared gallery reads
+`https://res.cloudinary.com/fgxnqd2s/image/list/athens40.json`.
 
-### 1. Cloudinary — photo uploads and the gallery
+That list URL stays blocked until **Settings → Security → Restricted
+media types → Resource list** is cleared in the Cloudinary Console
+(after you claim the cloud). Uploads still work either way; only the
+public grid needs that checkbox off.
 
-1. Sign up at [cloudinary.com](https://cloudinary.com). Your
-   **Cloud name** is on the dashboard.
-2. **Settings → Upload → Upload presets → Add upload preset.**
-   - Set **Signing mode** to **Unsigned**. This is what lets guests
-     upload straight from the browser with no server.
-   - Under **Upload manipulations**, add the tag `athens40` so photos
-     land in the gallery even if a request omits it.
-   - Save, and copy the preset name.
-3. **Settings → Security → Restricted media types** and clear the
-   **Resource list** checkbox.
+The JSON is cached for about 60 seconds. The uploader sees their own
+photo immediately via `localStorage` (marked "שלי"). Cap is 1000 images.
 
-   This one is easy to miss and it is what makes the public gallery
-   work: the site reads
-   `https://res.cloudinary.com/<cloud>/image/list/athens40.json`
-   directly from the browser. Leave it checked and photos still upload
-   fine, but nobody sees the gallery — and the gallery says so.
-4. Put the cloud name and preset name into `config.js`.
+Photos are downscaled to 1600px JPEG in the browser before upload.
 
-Two things worth knowing:
+## Google Form RSVPs
 
-- That JSON is **cached by the CDN for about 60 seconds**, so a photo
-  can take a minute to appear for other visitors. The uploader always
-  sees their own photo immediately, because it is mirrored into
-  `localStorage` and merged into the grid (marked "שלי").
-- The list endpoint is **public and capped at 1000 images**. Fine for a
-  birthday party; do not reuse the pattern for anything private.
+Each submission lands on
+[TAVERNA TAKE OVER — RSVP](https://docs.google.com/forms/d/107CER66e14gAUNG41F9bk__XNOi9DmxbwNj0wbg67dY/edit#responses)
+and in the linked Sheet
+[TAVERNA TAKE OVER — RSVP (Responses)](https://docs.google.com/spreadsheets/d/1QPKcI1wTEdy4OoKx2rtY3x3nMatgpPPrIIncZDTPom0/edit).
 
-Photos are downscaled to 1600px and re-encoded as JPEG in the browser
-before upload, so a 6MB phone photo goes up as roughly 300KB.
+Fields: `fullName`, `email`, `phone`, `guests`, `euroleague`, `hotel`,
+`notes`, `photoUrl`, `photoId`. A hidden honeypot `_gotcha` drops bots
+without posting.
 
-### 2. Formspree — receiving the RSVPs
-
-1. Sign up at [formspree.io](https://formspree.io) and create a form.
-2. Copy the ID out of the endpoint `https://formspree.io/f/<ID>` into
-   `formspree.formId`.
-
-The free tier allows **50 submissions per month** and does **not**
-support file uploads. That is fine here: the photo goes to Cloudinary
-and Formspree only receives its URL as a text field.
-
-Each submission arrives with `fullName`, `email`, `phone`, `guests`,
-`euroleague`, `hotel`, `notes`, `photoUrl` and `photoId`. A hidden
-honeypot named `_gotcha` filters out bots.
-
-### 3. WhatsApp
-
-Set `host.whatsapp` to digits only, with the country code and no leading
-`+` or `0` — for example `972501234567`. Until then the WhatsApp buttons
-are inert rather than broken.
-
-### 4. Music (optional)
+## Music (optional)
 
 Drop a looping instrumental bouzouki `.mp3` at
 `assets/tavern-vibes.mp3`, or point `music.src` at any direct audio URL.

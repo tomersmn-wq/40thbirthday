@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="TAVERNA TAKE OVER">
 <meta property="og:title" content="TAVERNA TAKE OVER — חוגגים 40 לדור נצר באתונה">
 <meta property="og:description" content="יאסו של החיים! כולם מתייצבים באתונה ל־40 של דור, 4–6 בדצמבר. טברנה, מועדון, סיור קולינרי וורטיס VIP 🇬🇷">
-<!-- Add assets/og.jpg (1200x630) and uncomment for rich WhatsApp previews:
+<!-- Add assets/og.jpg (1200x630) and uncomment for rich link previews:
 <meta property="og:image" content="assets/og.jpg">
 <meta name="twitter:image" content="assets/og.jpg">
 -->
@@ -55,8 +55,8 @@
       d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.7a2 2 0 0 0 1.7-1l.5-.9A1.5 1.5 0 0 1 10.7 3h2.6a1.5 1.5 0 0 1 1.3.8l.5.9a2 2 0 0 0 1.7 1h1.7A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5v-9Z"/>
     <circle cx="12" cy="13" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/>
   </symbol>
-  <symbol id="i-whatsapp" viewBox="0 0 24 24">
-    <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.02c-.24.68-1.4 1.3-1.93 1.35-.53.06-1.02.08-1.76-.11-.44-.11-1.02-.3-1.76-.62-3.1-1.34-5.13-4.46-5.29-4.67-.15-.21-1.26-1.67-1.26-3.19 0-1.51.79-2.26 1.07-2.57.28-.3.61-.38.82-.38.2 0 .41 0 .59.01.19.01.44-.07.69.53.24.6.83 2.02.9 2.17.08.15.13.32.03.53-.1.2-.36.53-.55.75-.13.15-.28.27-.11.55.16.28.72 1.24 1.55 2 1.06.98 1.83 1.26 2.11 1.4.21.11.43.09.6-.07.19-.19.62-.7.79-.94.17-.24.34-.2.57-.11.23.08 1.5.75 1.76.89.25.13.42.2.48.31.06.11.06.66-.18 1.34Z"/>
+  <symbol id="i-phone" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M7.2 3.4c.4-.4 1-.5 1.5-.3l2.3 1c.5.2.8.7.8 1.3v2.2c0 .4-.2.8-.5 1.1L9.8 10c.8 1.7 2.2 3.1 3.9 3.9l1.3-1.5c.3-.3.7-.5 1.1-.5h2.2c.6 0 1.1.3 1.3.8l1 2.3c.2.5.1 1.1-.3 1.5l-1.5 1.5c-.4.4-1 .6-1.6.6C11.8 20.6 3.4 12.2 3.4 6.5c0-.6.2-1.2.6-1.6l3.2-1.5Z"/>
   </symbol>
   <symbol id="i-clip" viewBox="0 0 28 36">
     <path fill="currentColor" d="M8.2 2.2h11.6l4.6 11.2H3.6L8.2 2.2z"/>
@@ -82,7 +82,7 @@
       <span class="brand__txt"><b dir="ltr">TAVERNA</b><i>40 לדור</i></span>
     </a>
     <nav class="nav" aria-label="ניווט באתר">
-      <a href="#letter">מדור</a>
+      <a href="#letter">נאום פתיחה</a>
       <a href="#itinerary">לו״ז</a>
       <a href="#how">איך זה עובד</a>
       <a href="#rsvp">אישור הגעה</a>
@@ -435,7 +435,6 @@
       <form id="rsvpForm" class="form" novalidate>
         <input type="hidden" name="photoUrl" id="photoUrl">
         <input type="hidden" name="photoId" id="photoId">
-        <input type="hidden" name="_subject" value="RSVP חדש — 40 לדור נצר (אתונה)">
         <p class="hp" aria-hidden="true"><label>אל תמלאו את זה<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
 
         <div class="field">
@@ -451,7 +450,7 @@
             <p class="err" id="err-email" data-for="email"></p>
           </div>
           <div class="field">
-            <label for="phone">וואטסאפ <em>*</em></label>
+            <label for="phone">טלפון <em>*</em></label>
             <input type="tel" id="phone" name="phone" dir="ltr" autocomplete="tel" inputmode="tel" required minlength="9" placeholder="+972 50 000 0000" aria-describedby="err-phone hint-phone">
             <p class="hint" id="hint-phone">כאן נשלח עדכונים ושינויים בלו״ז</p>
             <p class="err" id="err-phone" data-for="phone"></p>
@@ -542,10 +541,10 @@
         <canvas class="done__confetti" id="confetti" aria-hidden="true"></canvas>
         <p class="done__emoji" aria-hidden="true">🥂</p>
         <h3 class="done__h" dir="ltr">OPA!</h3>
-        <p class="done__p">קיבלנו את אישור ההגעה שלכם — אתם רשומים. <br>נהיה בקשר בוואטסאפ עם כל הפרטים הסופיים. <span dir="ltr">🇬🇷</span></p>
+        <p class="done__p">קיבלנו את אישור ההגעה שלכם — אתם רשומים. <br>נהיה בקשר בטלפון עם כל הפרטים הסופיים. <span dir="ltr">🇬🇷</span></p>
         <div class="done__cta">
           <a class="btn btn--ghost" href="#gallery">לגלריה המשותפת</a>
-          <a class="btn btn--mini" href="#" id="doneWa" data-wa-msg="היי! אישרתי הגעה לאתונה, יש לי שאלה 🇬🇷">שאלה בוואטסאפ</a>
+          <a class="btn btn--mini" href="tel:+972505477110" data-call>להתקשר למארגנים</a>
         </div>
       </div>
     </div>
@@ -626,7 +625,7 @@
             <li>יוון עובדת ב<b>אירו</b>, וכרטיסי אשראי מקובלים כמעט בכל מקום.</li>
             <li>שווה מזומן קטן לשווקים, לדוכני אוכל רחוב ולמוניות.</li>
             <li><b>טיפים</b> — לא חובה כמו בארה״ב. <span dir="ltr">5–10%</span> במסעדה זה נדיב ומקובל.</li>
-            <li>ההוצאות המשותפות (טברנה, סיור קולינרי, הופעה, לינה) יסוכמו מראש בוואטסאפ — לא תופתעו בשטח.</li>
+            <li>ההוצאות המשותפות (טברנה, סיור קולינרי, הופעה, לינה) יסוכמו מראש — לא תופתעו בשטח.</li>
           </ul>
         </div>
       </details>
@@ -642,10 +641,10 @@
       <details name="faq">
         <summary>נשארו לי שאלות</summary>
         <div class="acc__body">
-          <p>הדרך הזריזה ביותר להשיג אותנו היא בוואטסאפ. אל תתביישו.</p>
-          <a class="btn btn--wa" href="#" data-wa-msg="היי! יש לי שאלה על הטיול לאתונה 🇬🇷">
-            <svg aria-hidden="true"><use href="#i-whatsapp"/></svg>
-            <span>וואטסאפ למארגנים</span>
+          <p>הדרך הזריזה ביותר להשיג אותנו היא בטלפון. אל תתביישו.</p>
+          <a class="btn btn--call" href="tel:+972505477110" data-call>
+            <svg aria-hidden="true"><use href="#i-phone"/></svg>
+            <span dir="ltr">+972 50-547-7110</span>
           </a>
         </div>
       </details>
@@ -664,8 +663,8 @@
 <!-- ── sticky mobile CTA ───────────────────────────────────────────── -->
 <div class="mcta" id="mcta">
   <a class="btn btn--gold" href="#rsvp">אישור הגעה</a>
-  <a class="mcta__wa" href="#" data-wa-msg="היי! יש לי שאלה על הטיול לאתונה 🇬🇷" aria-label="שליחת הודעת וואטסאפ למארגנים">
-    <svg aria-hidden="true"><use href="#i-whatsapp"/></svg>
+  <a class="mcta__call" href="tel:+972505477110" data-call aria-label="התקשרות למארגנים">
+    <svg aria-hidden="true"><use href="#i-phone"/></svg>
   </a>
 </div>
 

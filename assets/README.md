@@ -20,6 +20,6 @@ rather than erroring.
 
 ## `og.jpg`
 
-Optional 1200x630 preview image for WhatsApp and iMessage link previews.
+Optional 1200x630 preview image for iMessage and other link previews.
 If you add it, uncomment the two `og:image` / `twitter:image` tags in the
 `<head>` of `index.html`.

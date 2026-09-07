@@ -245,12 +245,12 @@ h1, h2, h3, h4 { font-family: var(--f-heb); font-weight: 700; line-height: 1.2; 
   color: #fff;
   box-shadow: none;
 }
-.btn--wa {
-  background: #25D366;
-  color: #06331A;
+.btn--call {
+  background: var(--aegean);
+  color: #fff;
   margin-block-start: .5rem;
 }
-.btn--wa svg { width: 22px; height: 22px; }
+.btn--call svg { width: 20px; height: 20px; }
 
 .btn--submit {
   width: 100%;
@@ -1502,16 +1502,16 @@ input:focus, textarea:focus, select:focus {
   transition: translate .28s ease, opacity .28s ease;
 }
 .mcta .btn { flex: 1; min-height: 46px; }
-.mcta__wa {
+.mcta__call {
   flex: none;
   display: grid;
   place-items: center;
   width: 46px; height: 46px;
   border-radius: 50%;
-  background: #25D366;
-  color: #06331A;
+  background: var(--aegean);
+  color: #fff;
 }
-.mcta__wa svg { width: 24px; height: 24px; }
+.mcta__call svg { width: 22px; height: 22px; }
 .mcta.is-hidden { translate: 0 120%; opacity: 0; pointer-events: none; }
 
 @media (min-width: 54rem) {
