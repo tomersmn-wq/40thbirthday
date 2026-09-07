@@ -28,9 +28,12 @@ window.SITE_CONFIG = {
   },
 
   // Tavern music. A local file in assets/, or any direct audio URL.
+  // autoplay: browsers usually block unmuted sound until a user gesture;
+  // we try on load, then start on the first click, key, or scroll.
   music: {
     src: "assets/tavern-vibes.mp3",
     volume: 0.45,
+    autoplay: true,
   },
 
   // Taverna dinner on Friday night — what the countdown counts down to.

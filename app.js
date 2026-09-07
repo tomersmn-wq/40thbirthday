@@ -209,14 +209,34 @@
       try { localStorage.setItem(LS_VOL, vol.value); } catch (e) {}
     });
 
+    function tryPlay() {
+      var p = audio.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+
     btn.addEventListener("click", function () {
-      if (audio.paused) {
-        var p = audio.play();
-        if (p && p.catch) p.catch(function () { disable("לא הצלחנו לנגן"); });
-      } else {
-        audio.pause();
-      }
+      if (audio.paused) tryPlay();
+      else audio.pause();
     });
+
+    if (MUSIC.autoplay !== false) {
+      tryPlay();
+      var cap = { capture: true, passive: true };
+      var unlock = function (e) {
+        if (e && e.target && btn.contains(e.target)) return;
+        tryPlay();
+        document.removeEventListener("pointerdown", unlock, cap);
+        document.removeEventListener("keydown", unlock, cap);
+        window.removeEventListener("scroll", unlock, cap);
+        window.removeEventListener("wheel", unlock, cap);
+        window.removeEventListener("touchmove", unlock, cap);
+      };
+      document.addEventListener("pointerdown", unlock, cap);
+      document.addEventListener("keydown", unlock, cap);
+      window.addEventListener("scroll", unlock, cap);
+      window.addEventListener("wheel", unlock, cap);
+      window.addEventListener("touchmove", unlock, cap);
+    }
 
     audio.addEventListener("play", function () { btn.setAttribute("aria-pressed", "true"); });
     audio.addEventListener("pause", function () { btn.setAttribute("aria-pressed", "false"); });
