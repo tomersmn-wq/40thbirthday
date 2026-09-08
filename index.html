@@ -505,28 +505,21 @@
           <textarea id="notes" name="notes" rows="3" placeholder="צמחוני, ללא גלוטן, אלרגיה לאגוזים, מגיע/ה בטיסה מאוחרת…"></textarea>
         </div>
 
-        <!-- mandatory nostalgia photo -->
+        <!-- mandatory nostalgia photos -->
         <div class="field upload" id="upload">
-          <label for="photoInput" class="upload__lbl">תמונה שלנו מהעבר <em>*</em></label>
-          <p class="hint">תוסיפו תמונה שלנו מהעבר — שיהיה לנו זיכרון מתוק 💙 כל התמונות יופיעו בגלריה המשותפת באתר.</p>
+          <label for="photoInput" class="upload__lbl">תמונות שלנו מהעבר <em>*</em></label>
+          <p class="hint">תוסיפו תמונה אחת או כמה יחד — שיהיה לנו זיכרון מתוק 💙 אפשר למחוק כל תמונה לפני השליחה, וכל מה שיעלה יופיע בגלריה המשותפת.</p>
 
-          <input type="file" id="photoInput" accept="image/*" class="visually-hidden" aria-describedby="err-photo up-status">
+          <input type="file" id="photoInput" accept="image/*" multiple class="visually-hidden" aria-describedby="err-photo">
+
+          <div class="shots" id="shots" hidden></div>
 
           <label class="drop" id="drop" for="photoInput">
             <svg class="drop__ico" aria-hidden="true"><use href="#i-camera"/></svg>
-            <b>בחרו תמונה מהגלריה או צלמו עכשיו</b>
-            <i>JPG / PNG / HEIC · עד <span dir="ltr">15MB</span></i>
-            <span class="btn btn--mini">בחירת תמונה</span>
+            <b id="dropTitle">בחרו תמונות מהגלריה או צלמו עכשיו</b>
+            <i>אפשר כמה יחד · JPG / PNG / HEIC · עד <span dir="ltr">15MB</span> לתמונה</i>
+            <span class="btn btn--mini" id="dropBtn">בחירת תמונות</span>
           </label>
-
-          <div class="shot" id="shot" hidden>
-            <img id="photoPreview" alt="התמונה שבחרתם">
-            <div class="shot__body">
-              <div class="bar" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="התקדמות ההעלאה"><i id="barFill"></i></div>
-              <p class="shot__status" id="up-status" role="status"></p>
-              <button type="button" class="linkbtn" id="photoRemove">החלפת תמונה</button>
-            </div>
-          </div>
 
           <p class="err" id="err-photo" data-for="photo"></p>
         </div>

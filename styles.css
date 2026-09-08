@@ -1238,8 +1238,10 @@ input:focus, textarea:focus, select:focus {
 .drop i { font-style: normal; font-size: .8rem; color: var(--ink-soft); }
 .drop .btn--mini { margin-block-start: .5rem; pointer-events: none; }
 .field.has-err .drop { border-color: var(--terracotta); background: #FFF7F4; }
-#photoInput:focus-visible + .drop { outline: 3px solid var(--turquoise); outline-offset: 3px; }
+#photoInput:focus-visible ~ .drop { outline: 3px solid var(--turquoise); outline-offset: 3px; }
 
+.shots { display: grid; gap: .65rem; }
+.shots[hidden], .drop[hidden] { display: none; }
 .shot {
   display: grid;
   grid-template-columns: 84px 1fr;
@@ -1250,12 +1252,31 @@ input:focus, textarea:focus, select:focus {
   border-radius: var(--r);
   background: #FCFDFE;
 }
+.shot__thumb { position: relative; width: 84px; height: 84px; }
 .shot img {
   width: 84px; height: 84px;
   object-fit: cover;
   border-radius: var(--r-sm);
   background: var(--line) var(--meander-gold) center / auto no-repeat;
 }
+.shot__x {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: -.35rem;
+  inset-inline-end: -.35rem;
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: #1B2A3A;
+  color: #fff;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .28);
+}
+.shot__x:hover { background: var(--terracotta); }
 /* keep the browser's broken-image glyph and alt text out of the layout */
 .shot img:not([src]), .shot img.is-broken { color: transparent; }
 .shot__body { display: grid; gap: .4rem; justify-items: start; min-width: 0; }
@@ -1353,7 +1374,15 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--sh-1);
   transition: translate .18s, box-shadow .18s;
 }
-.gal__item img { width: 100%; height: 100%; object-fit: cover; }
+.gal__open {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.gal__item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gal__item:hover { translate: 0 -3px; box-shadow: var(--sh-2); }
 .gal__item::after {
   content: "";
@@ -1361,9 +1390,27 @@ input:focus, textarea:focus, select:focus {
   inset: 0;
   border: 3px solid transparent;
   border-radius: var(--r-sm);
+  pointer-events: none;
   transition: border-color .18s;
 }
 .gal__item:hover::after { border-color: var(--gold); }
+.gal__del {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: .35rem;
+  inset-inline-end: .35rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: rgba(20, 24, 32, .78);
+  color: #fff;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.gal__del:hover { background: var(--terracotta); }
 .gal__item.is-mine::before {
   content: "שלי";
   position: absolute;

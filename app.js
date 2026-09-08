@@ -25,6 +25,7 @@
 
   var GAL_TAG = CLD.galleryTag || "athens40";
   var LS_MINE = "athens40:mine";
+  var LS_HIDDEN = "athens40:hidden";
   var LS_VOL = "athens40:vol";
   var SS_SETUP = "athens40:setupSeen";
 
@@ -284,6 +285,36 @@
     } catch (e) { /* quota exceeded — the remote list still has it */ }
   }
 
+  function hiddenIds() {
+    try { return JSON.parse(localStorage.getItem(LS_HIDDEN) || "[]"); } catch (e) { return []; }
+  }
+  function hidePhoto(publicId) {
+    if (!publicId) return;
+    try {
+      var ids = hiddenIds();
+      if (ids.indexOf(publicId) === -1) ids.push(publicId);
+      localStorage.setItem(LS_HIDDEN, JSON.stringify(ids.slice(-200)));
+    } catch (e) { /* ignore quota */ }
+  }
+  function forget(publicId) {
+    if (!publicId) return;
+    try {
+      localStorage.setItem(LS_MINE, JSON.stringify(myPhotos().filter(function (it) {
+        return it.public_id !== publicId;
+      })));
+    } catch (e) { /* ignore */ }
+    hidePhoto(publicId);
+  }
+
+  var dropFormPhoto = function () {};
+
+  function removeGalleryPhoto(publicId) {
+    if (lb && !lb.hidden) closeLb();
+    forget(publicId);
+    dropFormPhoto(publicId);
+    renderGallery();
+  }
+
   function cldUrl(it, transform) {
     return "https://res.cloudinary.com/" + CLD.cloudName + "/image/upload/" + transform + "/" +
       (it.version ? "v" + it.version + "/" : "") + it.public_id + "." + (it.format || "jpg");
@@ -304,15 +335,17 @@
     if (!galEl) return;
 
     var seen = {};
+    var gone = {};
+    hiddenIds().forEach(function (id) { gone[id] = 1; });
     var list = [];
     myPhotos().forEach(function (it) {
-      if (!it.public_id || seen[it.public_id]) return;
+      if (!it.public_id || seen[it.public_id] || gone[it.public_id]) return;
       seen[it.public_id] = 1;
       it._mine = true;
       list.push(it);
     });
     remoteItems.forEach(function (it) {
-      if (!it.public_id || seen[it.public_id]) return;
+      if (!it.public_id || seen[it.public_id] || gone[it.public_id]) return;
       seen[it.public_id] = 1;
       list.push(it);
     });
@@ -336,9 +369,12 @@
     galEl.removeAttribute("aria-busy");
     galEl.innerHTML = "";
     list.forEach(function (it, i) {
+      var wrap = document.createElement("div");
+      wrap.className = "gal__item" + (it._mine ? " is-mine" : "");
+
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "gal__item" + (it._mine ? " is-mine" : "");
+      b.className = "gal__open";
       b.setAttribute("aria-label", "הגדלת תמונה " + (i + 1) + " מתוך " + list.length);
 
       var img = document.createElement("img");
@@ -349,7 +385,21 @@
 
       b.appendChild(img);
       b.addEventListener("click", function () { openLb(i); });
-      galEl.appendChild(b);
+      wrap.appendChild(b);
+
+      var del = document.createElement("button");
+      del.type = "button";
+      del.className = "gal__del";
+      del.setAttribute("aria-label", "מחיקת תמונה " + (i + 1));
+      del.textContent = "×";
+      del.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeGalleryPhoto(it.public_id);
+      });
+      wrap.appendChild(del);
+
+      galEl.appendChild(wrap);
     });
   }
 
@@ -423,74 +473,160 @@
   loadGallery();
 
   /* ═════════════════════════════════════════════════════════════════
-     9. mandatory photo upload
+     9. mandatory photo upload (multi-select)
      ═════════════════════════════════════════════════════════════════ */
   var MAX_BYTES = 15 * 1024 * 1024;
   var MAX_DIM = 1600;
+  var MAX_PHOTOS = 12;
 
   var form = $("#rsvpForm");
   var fileInput = $("#photoInput");
   var drop = $("#drop");
-  var shot = $("#shot");
-  var preview = $("#photoPreview");
-  var barFill = $("#barFill");
-  var bar = $("#bar");
-  var upStatus = $("#up-status");
+  var dropTitle = $("#dropTitle");
+  var dropBtn = $("#dropBtn");
+  var shotsEl = $("#shots");
   var photoUrl = $("#photoUrl");
   var photoId = $("#photoId");
   var uploadField = $("#upload");
   var submitBtn = $("#submitBtn");
   var submitTxt = $("#submitTxt");
   var SUBMIT_LABEL = submitTxt ? submitTxt.textContent : "";
+  var slots = [];
+  var slotSeq = 0;
 
-  var uploading = false;
-  var xhr = null;
-  var previewUrl = null;
-
-  function setProgress(pct) {
-    barFill.style.width = pct + "%";
-    bar.setAttribute("aria-valuenow", pct);
+  function busyCount() {
+    var n = 0;
+    slots.forEach(function (s) { if (s.busy) n++; });
+    return n;
   }
-  function upOk(msg) {
-    shot.className = "shot is-ok";
-    upStatus.textContent = msg;
-  }
-  function upFail(msg) {
-    shot.className = "shot is-bad";
-    upStatus.textContent = msg;
-    photoUrl.value = "";
-    photoId.value = "";
-    uploading = false;
-    lockSubmit(false);
-  }
-  function lockSubmit(on) {
+  function lockSubmit() {
     if (!submitBtn) return;
-    submitBtn.disabled = on;
-    submitTxt.textContent = on ? "רגע, מעלים את התמונה…" : SUBMIT_LABEL;
+    var n = busyCount();
+    submitBtn.disabled = n > 0;
+    submitTxt.textContent = n > 0 ? (n === 1 ? "רגע, מעלים את התמונה…" : "רגע, מעלים את התמונות…") : SUBMIT_LABEL;
+  }
+  function syncHiddenFields() {
+    var urls = [];
+    var ids = [];
+    slots.forEach(function (s) {
+      if (s.url && s.publicId) {
+        urls.push(s.url);
+        ids.push(s.publicId);
+      }
+    });
+    photoUrl.value = urls.join("\n");
+    photoId.value = ids.join("\n");
+  }
+  function syncDrop() {
+    var atMax = slots.length >= MAX_PHOTOS;
+    drop.hidden = atMax;
+    shotsEl.hidden = !slots.length;
+    if (dropTitle) dropTitle.textContent = slots.length ? "הוספת תמונות" : "בחרו תמונות מהגלריה או צלמו עכשיו";
+    if (dropBtn) dropBtn.textContent = slots.length ? "עוד תמונות" : "בחירת תמונות";
   }
 
-  function showPreview(blob) {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    previewUrl = URL.createObjectURL(blob);
-    preview.classList.remove("is-broken");
-    preview.src = previewUrl;
+  function setSlotProgress(slot, pct) {
+    slot.barFill.style.width = pct + "%";
+    slot.bar.setAttribute("aria-valuenow", String(pct));
+  }
+  function markSlot(slot, kind, msg) {
+    slot.el.className = "shot" + (kind ? " " + kind : "");
+    slot.status.textContent = msg;
   }
 
-  function resetPhoto() {
-    if (xhr) { xhr.abort(); xhr = null; }
-    uploading = false;
-    lockSubmit(false);
-    photoUrl.value = "";
-    photoId.value = "";
-    fileInput.value = "";
-    setProgress(0);
-    shot.hidden = true;
-    shot.className = "shot";
-    upStatus.textContent = "";
-    drop.hidden = false;
-    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
-    preview.removeAttribute("src");
+  function makeSlotEl(slot) {
+    var el = document.createElement("div");
+    el.className = "shot";
+    el.dataset.slot = slot.id;
+
+    var thumb = document.createElement("div");
+    thumb.className = "shot__thumb";
+
+    var img = document.createElement("img");
+    img.alt = "תמונה שנבחרה";
+    img.addEventListener("error", function () { img.classList.add("is-broken"); });
+
+    var x = document.createElement("button");
+    x.type = "button";
+    x.className = "shot__x";
+    x.setAttribute("aria-label", "מחיקת תמונה");
+    x.textContent = "×";
+    x.addEventListener("click", function () { removeSlot(slot.id); });
+
+    thumb.appendChild(img);
+    thumb.appendChild(x);
+
+    var body = document.createElement("div");
+    body.className = "shot__body";
+
+    var bar = document.createElement("div");
+    bar.className = "bar";
+    bar.setAttribute("role", "progressbar");
+    bar.setAttribute("aria-valuemin", "0");
+    bar.setAttribute("aria-valuemax", "100");
+    bar.setAttribute("aria-valuenow", "0");
+    bar.setAttribute("aria-label", "התקדמות ההעלאה");
+    var fill = document.createElement("i");
+    bar.appendChild(fill);
+
+    var status = document.createElement("p");
+    status.className = "shot__status";
+    status.setAttribute("role", "status");
+
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "linkbtn";
+    del.textContent = "מחיקת תמונה";
+    del.addEventListener("click", function () { removeSlot(slot.id); });
+
+    body.appendChild(bar);
+    body.appendChild(status);
+    body.appendChild(del);
+    el.appendChild(thumb);
+    el.appendChild(body);
+
+    slot.el = el;
+    slot.img = img;
+    slot.bar = bar;
+    slot.barFill = fill;
+    slot.status = status;
+    return el;
   }
+
+  function showSlotPreview(slot, blob) {
+    if (slot.previewUrl) URL.revokeObjectURL(slot.previewUrl);
+    slot.previewUrl = URL.createObjectURL(blob);
+    slot.img.classList.remove("is-broken");
+    slot.img.src = slot.previewUrl;
+  }
+
+  function removeSlot(id) {
+    var idx = -1;
+    var slot = null;
+    for (var i = 0; i < slots.length; i++) {
+      if (slots[i].id === id) { idx = i; slot = slots[i]; break; }
+    }
+    if (!slot) return;
+    slot.dead = true;
+    if (slot.xhr) { slot.xhr.abort(); slot.xhr = null; }
+    if (slot.previewUrl) { URL.revokeObjectURL(slot.previewUrl); slot.previewUrl = null; }
+    if (slot.publicId) {
+      forget(slot.publicId);
+      renderGallery();
+    }
+    if (slot.el && slot.el.parentNode) slot.el.parentNode.removeChild(slot.el);
+    slots.splice(idx, 1);
+    syncHiddenFields();
+    syncDrop();
+    lockSubmit();
+    if (!slots.length) fileInput.value = "";
+  }
+
+  dropFormPhoto = function (publicId) {
+    slots.slice().forEach(function (s) {
+      if (s.publicId === publicId) removeSlot(s.id);
+    });
+  };
 
   /* Downscale in the browser: mobile photos are 4–8MB and we only ever
      display them at 500px, so this makes uploads fast and keeps the
@@ -521,10 +657,10 @@
     });
   }
 
-  function uploadToCloud(blob, originalName) {
-    uploading = true;
-    lockSubmit(true);
-    upStatus.textContent = "מעלים…";
+  function uploadToCloud(slot, blob, originalName) {
+    slot.busy = true;
+    lockSubmit();
+    markSlot(slot, "", "מעלים…");
 
     var base = String(originalName || "photo").replace(/\.[^.]+$/, "").slice(0, 60) || "photo";
     var ext = blob.type === "image/jpeg" ? "jpg" : (String(originalName || "").split(".").pop() || "jpg");
@@ -534,25 +670,28 @@
     fd.append("upload_preset", CLD.uploadPreset);
     fd.append("tags", GAL_TAG);
 
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
+    slot.xhr = xhr;
     xhr.open("POST", "https://api.cloudinary.com/v1_1/" + CLD.cloudName + "/image/upload");
 
     xhr.upload.onprogress = function (e) {
-      if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 92));
+      if (e.lengthComputable) setSlotProgress(slot, Math.round((e.loaded / e.total) * 92));
     };
     xhr.onload = function () {
-      xhr = null;
-      uploading = false;
-      lockSubmit(false);
+      slot.xhr = null;
+      slot.busy = false;
+      lockSubmit();
+      if (slot.dead) return;
       var res = {};
       try { res = JSON.parse(this.responseText); } catch (e) {}
 
       if (this.status >= 200 && this.status < 300 && res.secure_url) {
-        setProgress(100);
-        photoUrl.value = res.secure_url;
-        photoId.value = res.public_id;
+        setSlotProgress(slot, 100);
+        slot.url = res.secure_url;
+        slot.publicId = res.public_id;
+        syncHiddenFields();
         clearErr(uploadField);
-        upOk("התמונה עלתה בהצלחה 💙");
+        markSlot(slot, "is-ok", "התמונה עלתה בהצלחה 💙");
         remember({
           public_id: res.public_id,
           format: res.format,
@@ -563,77 +702,94 @@
       } else {
         var msg = "ההעלאה נכשלה";
         if (res.error && res.error.message) msg += " — " + res.error.message;
-        upFail(msg + ". נסו שוב או בחרו תמונה אחרת.");
+        markSlot(slot, "is-bad", msg + ". מחקו אותה ונסו שוב.");
       }
     };
     xhr.onerror = function () {
-      xhr = null;
-      upFail("אין חיבור לשרת התמונות. בדקו את האינטרנט ונסו שוב.");
+      slot.xhr = null;
+      slot.busy = false;
+      lockSubmit();
+      if (slot.dead) return;
+      markSlot(slot, "is-bad", "אין חיבור לשרת התמונות. בדקו את האינטרנט ונסו שוב.");
     };
-    xhr.onabort = function () { xhr = null; };
+    xhr.onabort = function () { slot.xhr = null; };
     xhr.send(fd);
   }
 
   /* No Cloudinary yet: keep the photo in localStorage so the whole flow,
      including the gallery, is reviewable before any account exists. */
-  function storeLocally(blob) {
+  function storeLocally(slot, blob) {
+    slot.busy = true;
+    lockSubmit();
     var fr = new FileReader();
     fr.onload = function () {
-      var id = "demo-" + Date.now();
-      photoUrl.value = "(demo) Cloudinary not configured";
-      photoId.value = id;
-      setProgress(100);
+      slot.busy = false;
+      lockSubmit();
+      if (slot.dead) return;
+      var id = "demo-" + Date.now() + "-" + slot.id;
+      slot.url = "(demo) Cloudinary not configured";
+      slot.publicId = id;
+      setSlotProgress(slot, 100);
+      syncHiddenFields();
       clearErr(uploadField);
-      upOk("נשמר מקומית — מצב הדגמה");
+      markSlot(slot, "is-ok", "נשמר מקומית — מצב הדגמה");
       remember({ demo: true, src: fr.result, public_id: id, created_at: new Date().toISOString() });
       renderGallery();
     };
-    fr.onerror = function () { upFail("לא הצלחנו לקרוא את התמונה"); };
+    fr.onerror = function () {
+      slot.busy = false;
+      lockSubmit();
+      if (slot.dead) return;
+      markSlot(slot, "is-bad", "לא הצלחנו לקרוא את התמונה");
+    };
     fr.readAsDataURL(blob);
   }
 
   function handleFile(file) {
     if (!file) return;
+    if (slots.length >= MAX_PHOTOS) {
+      setErr(uploadField, "אפשר עד " + MAX_PHOTOS + " תמונות בטופס");
+      return;
+    }
     var looksLikeImage = /^image\//.test(file.type) || /\.(jpe?g|png|gif|webp|hei[cf]|avif)$/i.test(file.name);
     if (!looksLikeImage || file.size > MAX_BYTES) {
-      drop.hidden = false;
-      shot.hidden = true;
-      // clear it so picking the very same file again still fires change
-      fileInput.value = "";
-      setErr(uploadField, looksLikeImage ? "התמונה גדולה מדי — עד 15MB" : "אפשר להעלות תמונות בלבד");
+      setErr(uploadField, looksLikeImage ? "תמונה אחת גדולה מדי — עד 15MB לכל קובץ" : "אפשר להעלות תמונות בלבד");
       return;
     }
 
     clearErr(uploadField);
-    drop.hidden = true;
-    shot.hidden = false;
-    shot.className = "shot";
-    photoUrl.value = "";
-    photoId.value = "";
-    setProgress(0);
-    upStatus.textContent = "מכינים את התמונה…";
-
-    // show the original straight away; downscaling is async and an <img>
-    // with no src renders as a broken-image icon
-    showPreview(file);
+    var slot = {
+      id: String(++slotSeq),
+      busy: false,
+      dead: false,
+      url: "",
+      publicId: "",
+      previewUrl: null,
+      xhr: null
+    };
+    shotsEl.appendChild(makeSlotEl(slot));
+    slots.push(slot);
+    syncDrop();
+    markSlot(slot, "", "מכינים את התמונה…");
+    showSlotPreview(slot, file);
 
     shrink(file).then(function (blob) {
-      if (blob !== file) showPreview(blob);
-      if (HAS_CLOUD) uploadToCloud(blob, file.name);
-      else storeLocally(blob);
+      if (slot.dead) return;
+      if (blob !== file) showSlotPreview(slot, blob);
+      if (HAS_CLOUD) uploadToCloud(slot, blob, file.name);
+      else storeLocally(slot, blob);
     });
   }
 
-  if (fileInput) {
-    fileInput.addEventListener("change", function () { handleFile(this.files && this.files[0]); });
-    // HEIC cannot be decoded outside Safari; the upload still works, so
-    // fall back to a plain placeholder instead of a broken-image icon
-    preview.addEventListener("error", function () { preview.classList.add("is-broken"); });
-    $("#photoRemove").addEventListener("click", function () {
-      resetPhoto();
-      fileInput.click();
-    });
+  function handleFiles(list) {
+    if (!list || !list.length) return;
+    var i;
+    for (i = 0; i < list.length; i++) handleFile(list[i]);
+    fileInput.value = "";
+  }
 
+  if (fileInput) {
+    fileInput.addEventListener("change", function () { handleFiles(this.files); });
     ["dragenter", "dragover"].forEach(function (ev) {
       drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-over"); });
     });
@@ -642,8 +798,7 @@
     });
     drop.addEventListener("drop", function (e) {
       e.preventDefault();
-      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-      if (f) handleFile(f);
+      handleFiles(e.dataTransfer && e.dataTransfer.files);
     });
   }
 
@@ -706,8 +861,8 @@
   }
 
   function checkPhoto() {
-    if (uploading) {
-      setErr(uploadField, "רגע, התמונה עוד עולה…");
+    if (busyCount() > 0) {
+      setErr(uploadField, "רגע, התמונות עוד עולות…");
       return false;
     }
     if (!photoUrl.value) {
