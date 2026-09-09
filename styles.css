@@ -1184,6 +1184,7 @@ input:focus, textarea:focus, select:focus {
 /* radio option cards */
 .opts { display: grid; gap: .6rem; }
 @media (min-width: 34rem) { .opts { grid-template-columns: 1fr 1fr; } }
+.opts--stack { grid-template-columns: 1fr; }
 
 .opt { position: relative; display: block; cursor: pointer; }
 .opt input {
