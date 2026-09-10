@@ -54,6 +54,17 @@ photo immediately via `localStorage` (marked "שלי"). Cap is 1000 images.
 
 Photos are downscaled to 1600px JPEG in the browser before upload.
 
+## RSVP copies (email + Sheet)
+
+The guest "OPA" screen is shown only after FormSubmit confirms it emailed
+`notifyEmail` in `config.js`. That inbox is the source of truth.
+
+The Google Form / Sheet post still runs afterwards, but Google does not
+tell the browser whether it worked, so it is treated as a backup copy.
+
+The first live submit sends FormSubmit an activation mail to that address.
+Click the link once before guests RSVP.
+
 ## Google Form RSVPs
 
 Each submission lands on

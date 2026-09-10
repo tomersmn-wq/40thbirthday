@@ -19,13 +19,14 @@
   var GF = CFG.googleForm || {};
   var GF_ENTRIES = GF.entries || {};
   var PHONE_DIGITS = String(HOST.phone || "").replace(/\D/g, "");
+  var NOTIFY_EMAIL = (CFG.notifyEmail || "").trim();
   var HAS_CLOUD = filled(CLD.cloudName) && filled(CLD.uploadPreset);
   var HAS_FORM = filled(GF.action) && filled(GF_ENTRIES.fullName);
   var HAS_PHONE = filled(HOST.phone) && /^\d{8,15}$/.test(PHONE_DIGITS);
+  var HAS_NOTIFY = filled(NOTIFY_EMAIL) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(NOTIFY_EMAIL);
 
   var GAL_TAG = CLD.galleryTag || "athens40";
   var LS_MINE = "athens40:mine";
-  var LS_HIDDEN = "athens40:hidden";
   var LS_VOL = "athens40:vol";
   var SS_SETUP = "athens40:setupSeen";
 
@@ -43,6 +44,7 @@
     var missing = [];
     if (!HAS_CLOUD) missing.push("Cloudinary");
     if (!HAS_FORM) missing.push("Google Form");
+    if (!HAS_NOTIFY) missing.push("אימייל לאישורי הגעה");
     if (!HAS_PHONE) missing.push("טלפון");
     if (!missing.length) return;
 
@@ -285,36 +287,6 @@
     } catch (e) { /* quota exceeded — the remote list still has it */ }
   }
 
-  function hiddenIds() {
-    try { return JSON.parse(localStorage.getItem(LS_HIDDEN) || "[]"); } catch (e) { return []; }
-  }
-  function hidePhoto(publicId) {
-    if (!publicId) return;
-    try {
-      var ids = hiddenIds();
-      if (ids.indexOf(publicId) === -1) ids.push(publicId);
-      localStorage.setItem(LS_HIDDEN, JSON.stringify(ids.slice(-200)));
-    } catch (e) { /* ignore quota */ }
-  }
-  function forget(publicId) {
-    if (!publicId) return;
-    try {
-      localStorage.setItem(LS_MINE, JSON.stringify(myPhotos().filter(function (it) {
-        return it.public_id !== publicId;
-      })));
-    } catch (e) { /* ignore */ }
-    hidePhoto(publicId);
-  }
-
-  var dropFormPhoto = function () {};
-
-  function removeGalleryPhoto(publicId) {
-    if (lb && !lb.hidden) closeLb();
-    forget(publicId);
-    dropFormPhoto(publicId);
-    renderGallery();
-  }
-
   function cldUrl(it, transform) {
     return "https://res.cloudinary.com/" + CLD.cloudName + "/image/upload/" + transform + "/" +
       (it.version ? "v" + it.version + "/" : "") + it.public_id + "." + (it.format || "jpg");
@@ -335,17 +307,15 @@
     if (!galEl) return;
 
     var seen = {};
-    var gone = {};
-    hiddenIds().forEach(function (id) { gone[id] = 1; });
     var list = [];
     myPhotos().forEach(function (it) {
-      if (!it.public_id || seen[it.public_id] || gone[it.public_id]) return;
+      if (!it.public_id || seen[it.public_id]) return;
       seen[it.public_id] = 1;
       it._mine = true;
       list.push(it);
     });
     remoteItems.forEach(function (it) {
-      if (!it.public_id || seen[it.public_id] || gone[it.public_id]) return;
+      if (!it.public_id || seen[it.public_id]) return;
       seen[it.public_id] = 1;
       list.push(it);
     });
@@ -386,18 +356,6 @@
       b.appendChild(img);
       b.addEventListener("click", function () { openLb(i); });
       wrap.appendChild(b);
-
-      var del = document.createElement("button");
-      del.type = "button";
-      del.className = "gal__del";
-      del.setAttribute("aria-label", "מחיקת תמונה " + (i + 1));
-      del.textContent = "×";
-      del.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        removeGalleryPhoto(it.public_id);
-      });
-      wrap.appendChild(del);
 
       galEl.appendChild(wrap);
     });
@@ -610,10 +568,6 @@
     slot.dead = true;
     if (slot.xhr) { slot.xhr.abort(); slot.xhr = null; }
     if (slot.previewUrl) { URL.revokeObjectURL(slot.previewUrl); slot.previewUrl = null; }
-    if (slot.publicId) {
-      forget(slot.publicId);
-      renderGallery();
-    }
     if (slot.el && slot.el.parentNode) slot.el.parentNode.removeChild(slot.el);
     slots.splice(idx, 1);
     syncHiddenFields();
@@ -621,12 +575,6 @@
     lockSubmit();
     if (!slots.length) fileInput.value = "";
   }
-
-  dropFormPhoto = function (publicId) {
-    slots.slice().forEach(function (s) {
-      if (s.publicId === publicId) removeSlot(s.id);
-    });
-  };
 
   /* Downscale in the browser: mobile photos are 4–8MB and we only ever
      display them at 500px, so this makes uploads fast and keeps the
@@ -937,12 +885,32 @@
       return;
     }
 
-    if (!HAS_FORM) {
-      console.info("[demo] RSVP would be sent to Google Forms:", payload);
+    // Demo: nothing is configured yet, so the page still walks through
+    // the success screen without claiming a registration was received.
+    if (!HAS_NOTIFY && !HAS_FORM) {
       setTimeout(ok, 900);
       return;
     }
 
+    if (!HAS_NOTIFY) {
+      bad("השליחה לא אושרה. התקשרו אלינו ונרשום אתכם ידנית.");
+      return;
+    }
+
+    sendNotifyEmail(payload)
+      .then(function () {
+        // Sheet copy is best-effort. Google Forms has no CORS, so an
+        // opaque response cannot be trusted — the email is the proof.
+        postGoogleForm(payload);
+        ok();
+      })
+      .catch(function () {
+        bad("לא הצלחנו לאשר את ההרשמה. נסו שוב, או התקשרו אלינו.");
+      });
+  }
+
+  function postGoogleForm(payload) {
+    if (!HAS_FORM) return;
     var fd = new FormData();
     Object.keys(GF_ENTRIES).forEach(function (name) {
       var entry = GF_ENTRIES[name];
@@ -951,14 +919,37 @@
       if (val == null) val = "";
       fd.append("entry." + String(entry).replace(/^entry\./, ""), val);
     });
+    fetch(GF.action, { method: "POST", mode: "no-cors", body: fd }).catch(function () {});
+  }
 
-    // Google does not send CORS headers. mode: 'no-cors' still delivers the
-    // POST, then we treat it as success the same way a hidden-iframe submit would.
-    fetch(GF.action, { method: "POST", mode: "no-cors", body: fd })
-      .then(function () { ok(); })
-      .catch(function () {
-        bad("נראה שאין חיבור לאינטרנט. נסו שוב בעוד רגע.");
+  function sendNotifyEmail(payload) {
+    var body = {
+      _subject: "RSVP — TAVERNA TAKE OVER — " + (payload.fullName || ""),
+      _template: "table",
+      _captcha: "false",
+      _replyto: payload.email || "",
+      fullName: payload.fullName || "",
+      email: payload.email || "",
+      phone: payload.phone || "",
+      guests: payload.guests || "",
+      euroleague: payload.euroleague || "",
+      hotel: payload.hotel || "",
+      notes: payload.notes || "",
+      photoUrl: payload.photoUrl || "",
+      photoId: payload.photoId || ""
+    };
+    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(NOTIFY_EMAIL), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        var okFlag = data && (data.success === true || data.success === "true");
+        if (!r.ok || !okFlag) throw new Error((data && data.message) || "notify failed");
+      }, function () {
+        throw new Error("notify failed");
       });
+    });
   }
 
   function showDone() {
