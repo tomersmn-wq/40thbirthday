@@ -19,9 +19,11 @@
   var GF = CFG.googleForm || {};
   var GF_ENTRIES = GF.entries || {};
   var PHONE_DIGITS = String(HOST.phone || "").replace(/\D/g, "");
+  var NOTIFY_EMAIL = (CFG.notifyEmail || "").trim();
   var HAS_CLOUD = filled(CLD.cloudName) && filled(CLD.uploadPreset);
   var HAS_FORM = filled(GF.action) && filled(GF_ENTRIES.fullName);
   var HAS_PHONE = filled(HOST.phone) && /^\d{8,15}$/.test(PHONE_DIGITS);
+  var HAS_NOTIFY = filled(NOTIFY_EMAIL) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(NOTIFY_EMAIL);
 
   var GAL_TAG = CLD.galleryTag || "athens40";
   var LS_MINE = "athens40:mine";
@@ -934,6 +936,7 @@
     }
 
     if (!HAS_FORM) {
+      pingOrganizer(payload);
       setTimeout(ok, 900);
       return;
     }
@@ -949,11 +952,47 @@
 
     // Google does not send CORS headers. mode: 'no-cors' still delivers the
     // POST, then we treat it as success the same way a hidden-iframe submit would.
+    pingOrganizer(payload);
     fetch(GF.action, { method: "POST", mode: "no-cors", body: fd })
       .then(function () { ok(); })
       .catch(function () {
         bad("נראה שאין חיבור לאינטרנט. נסו שוב בעוד רגע.");
       });
+  }
+
+  function pingOrganizer(payload) {
+    if (!HAS_NOTIFY) return;
+    var body = {
+      _subject: "RSVP — TAVERNA TAKE OVER — " + (payload.fullName || ""),
+      _template: "table",
+      _captcha: "false",
+      _replyto: payload.email || "",
+      fullName: payload.fullName || "",
+      email: payload.email || "",
+      phone: payload.phone || "",
+      guests: payload.guests || "",
+      euroleague: payload.euroleague || "",
+      hotel: payload.hotel || "",
+      notes: payload.notes || "",
+      photoUrl: payload.photoUrl || "",
+      photoId: payload.photoId || "",
+      message: [
+        "שם: " + (payload.fullName || ""),
+        "אימייל: " + (payload.email || ""),
+        "טלפון: " + (payload.phone || ""),
+        "אורחים: " + (payload.guests || ""),
+        "יורוליג: " + (payload.euroleague || ""),
+        "מלון: " + (payload.hotel || ""),
+        "הערות: " + (payload.notes || ""),
+        "תמונות: " + (payload.photoUrl || ""),
+        "מזהים: " + (payload.photoId || "")
+      ].join("\n")
+    };
+    fetch("https://formsubmit.co/ajax/" + encodeURIComponent(NOTIFY_EMAIL), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(body)
+    }).catch(function () { /* extra eyes only — never the RSVP gate */ });
   }
 
   function showDone() {

@@ -56,16 +56,13 @@ Photos are downscaled to 1600px JPEG in the browser before upload.
 
 ## Organizer email copy
 
-The site does not send email itself. A public webpage cannot mail
-`dornetzer66@gmail.com` without a third party that first proves it owns
-that inbox — that proof is the activation link you saw.
+The Sheet is still the registration. After a guest submits, the page also
+posts a copy to FormSubmit for `dornetzer66@gmail.com`. OPA does not wait
+on that mail.
 
-Instead, when a row hits the RSVP Sheet, Google Apps Script (`rsvp-email.gs`)
-mails Dor the answers. Guests are unaffected. His inbox only gets the
-signup, never an activate-this-form link.
-
-Paste `rsvp-email.gs` into the Sheet (Extensions → Apps Script), run
-`install` once, and approve sending email.
+The first live submit (from a real `http`/`https` page, not a local file)
+sends FormSubmit an activation link to that Gmail. Click it once (check
+Spam). After that, each RSVP should arrive as a normal FormSubmit email.
 
 ## Google Form RSVPs
 

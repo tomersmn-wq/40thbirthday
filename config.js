@@ -13,6 +13,11 @@ window.SITE_CONFIG = {
     galleryTag: "athens40",
   },
 
+  // Extra copy of every RSVP for the organizer. Fired in the background;
+  // guests see OPA from the Google Sheet post, not from this.
+  // First live submit sends FormSubmit an activation mail — click it once.
+  notifyEmail: "dornetzer66@gmail.com",
+
   // Google Form — RSVPs land in Form responses (and the linked Sheet).
   // action is the formResponse URL; entries map our field names to entry.IDs.
   googleForm: {
