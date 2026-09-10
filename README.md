@@ -54,16 +54,18 @@ photo immediately via `localStorage` (marked "שלי"). Cap is 1000 images.
 
 Photos are downscaled to 1600px JPEG in the browser before upload.
 
-## RSVP copies (email + Sheet)
+## Organizer email copy
 
-The guest "OPA" screen is shown only after FormSubmit confirms it emailed
-`notifyEmail` in `config.js`. That inbox is the source of truth.
+The site does not send email itself. A public webpage cannot mail
+`dornetzer66@gmail.com` without a third party that first proves it owns
+that inbox — that proof is the activation link you saw.
 
-The Google Form / Sheet post still runs afterwards, but Google does not
-tell the browser whether it worked, so it is treated as a backup copy.
+Instead, when a row hits the RSVP Sheet, Google Apps Script (`rsvp-email.gs`)
+mails Dor the answers. Guests are unaffected. His inbox only gets the
+signup, never an activate-this-form link.
 
-The first live submit sends FormSubmit an activation mail to that address.
-Click the link once before guests RSVP.
+Paste `rsvp-email.gs` into the Sheet (Extensions → Apps Script), run
+`install` once, and approve sending email.
 
 ## Google Form RSVPs
 

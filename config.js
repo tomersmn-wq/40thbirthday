@@ -13,13 +13,7 @@ window.SITE_CONFIG = {
     galleryTag: "athens40",
   },
 
-  // Inbox that gets a copy of every RSVP. FormSubmit returns a real JSON
-  // success/fail, so this is what the guest "OPA" screen waits on.
-  // First live submit sends an activation mail — click it once, then guests work.
-  notifyEmail: "dornetzer@google.com",
-
   // Google Form — RSVPs land in Form responses (and the linked Sheet).
-  // Best-effort only: Google does not tell the browser if the POST landed.
   // action is the formResponse URL; entries map our field names to entry.IDs.
   googleForm: {
     action: "https://docs.google.com/forms/d/e/1FAIpQLSdrUNM17ngTRTVZXyDGgSkQV86nk7vfmZaJJIzyZVW2WOO-sA/formResponse",

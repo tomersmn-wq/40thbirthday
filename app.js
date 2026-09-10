@@ -19,11 +19,9 @@
   var GF = CFG.googleForm || {};
   var GF_ENTRIES = GF.entries || {};
   var PHONE_DIGITS = String(HOST.phone || "").replace(/\D/g, "");
-  var NOTIFY_EMAIL = (CFG.notifyEmail || "").trim();
   var HAS_CLOUD = filled(CLD.cloudName) && filled(CLD.uploadPreset);
   var HAS_FORM = filled(GF.action) && filled(GF_ENTRIES.fullName);
   var HAS_PHONE = filled(HOST.phone) && /^\d{8,15}$/.test(PHONE_DIGITS);
-  var HAS_NOTIFY = filled(NOTIFY_EMAIL) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(NOTIFY_EMAIL);
 
   var GAL_TAG = CLD.galleryTag || "athens40";
   var LS_MINE = "athens40:mine";
@@ -44,7 +42,6 @@
     var missing = [];
     if (!HAS_CLOUD) missing.push("Cloudinary");
     if (!HAS_FORM) missing.push("Google Form");
-    if (!HAS_NOTIFY) missing.push("אימייל לאישורי הגעה");
     if (!HAS_PHONE) missing.push("טלפון");
     if (!missing.length) return;
 
@@ -885,32 +882,11 @@
       return;
     }
 
-    // Demo: nothing is configured yet, so the page still walks through
-    // the success screen without claiming a registration was received.
-    if (!HAS_NOTIFY && !HAS_FORM) {
+    if (!HAS_FORM) {
       setTimeout(ok, 900);
       return;
     }
 
-    if (!HAS_NOTIFY) {
-      bad("השליחה לא אושרה. התקשרו אלינו ונרשום אתכם ידנית.");
-      return;
-    }
-
-    sendNotifyEmail(payload)
-      .then(function () {
-        // Sheet copy is best-effort. Google Forms has no CORS, so an
-        // opaque response cannot be trusted — the email is the proof.
-        postGoogleForm(payload);
-        ok();
-      })
-      .catch(function () {
-        bad("לא הצלחנו לאשר את ההרשמה. נסו שוב, או התקשרו אלינו.");
-      });
-  }
-
-  function postGoogleForm(payload) {
-    if (!HAS_FORM) return;
     var fd = new FormData();
     Object.keys(GF_ENTRIES).forEach(function (name) {
       var entry = GF_ENTRIES[name];
@@ -919,37 +895,14 @@
       if (val == null) val = "";
       fd.append("entry." + String(entry).replace(/^entry\./, ""), val);
     });
-    fetch(GF.action, { method: "POST", mode: "no-cors", body: fd }).catch(function () {});
-  }
 
-  function sendNotifyEmail(payload) {
-    var body = {
-      _subject: "RSVP — TAVERNA TAKE OVER — " + (payload.fullName || ""),
-      _template: "table",
-      _captcha: "false",
-      _replyto: payload.email || "",
-      fullName: payload.fullName || "",
-      email: payload.email || "",
-      phone: payload.phone || "",
-      guests: payload.guests || "",
-      euroleague: payload.euroleague || "",
-      hotel: payload.hotel || "",
-      notes: payload.notes || "",
-      photoUrl: payload.photoUrl || "",
-      photoId: payload.photoId || ""
-    };
-    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(NOTIFY_EMAIL), {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify(body)
-    }).then(function (r) {
-      return r.json().then(function (data) {
-        var okFlag = data && (data.success === true || data.success === "true");
-        if (!r.ok || !okFlag) throw new Error((data && data.message) || "notify failed");
-      }, function () {
-        throw new Error("notify failed");
+    // Google does not send CORS headers. mode: 'no-cors' still delivers the
+    // POST, then we treat it as success the same way a hidden-iframe submit would.
+    fetch(GF.action, { method: "POST", mode: "no-cors", body: fd })
+      .then(function () { ok(); })
+      .catch(function () {
+        bad("נראה שאין חיבור לאינטרנט. נסו שוב בעוד רגע.");
       });
-    });
   }
 
   function showDone() {
