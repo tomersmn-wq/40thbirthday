@@ -509,10 +509,10 @@
           <textarea id="notes" name="notes" rows="3" placeholder="צמחוני, ללא גלוטן, אלרגיה לאגוזים, מגיע/ה בטיסה מאוחרת…"></textarea>
         </div>
 
-        <!-- mandatory nostalgia photos -->
+        <!-- optional nostalgia photos — skip is gated after submit -->
         <div class="field upload" id="upload">
-          <label for="photoInput" class="upload__lbl">תמונות שלנו מהעבר <em>*</em></label>
-          <p class="hint">תוסיפו תמונה אחת או כמה יחד — שיהיה לנו זיכרון מתוק 💙 אפשר להוריד תמונה מהטופס לפני השליחה; מה שכבר עלה נשאר בגלריה המשותפת.</p>
+          <label for="photoInput" class="upload__lbl">תמונות שלנו מהעבר</label>
+          <p class="hint">לא חובה, אבל זה החלק הכי כיף — תמונה אחת או כמה יחד לקיר הזיכרונות. אפשר להוריד תמונה מהטופס לפני השליחה; מה שכבר עלה נשאר בגלריה המשותפת.</p>
 
           <input type="file" id="photoInput" accept="image/*" multiple class="visually-hidden" aria-describedby="err-photo">
 
@@ -533,6 +533,17 @@
         </button>
         <p class="form__foot" id="formStatus" role="status" aria-live="polite"></p>
       </form>
+
+      <div class="gate" id="photoGate" hidden role="dialog" aria-modal="true" aria-labelledby="photoGate-h" aria-describedby="photoGate-p">
+        <div class="gate__tape" aria-hidden="true"></div>
+        <p class="gate__emoji" aria-hidden="true">🚧📸</p>
+        <h3 class="gate__h" id="photoGate-h">רגע, בלי תמונה?</h3>
+        <p class="gate__p" id="photoGate-p">בלי תמונה מהעבר זה כמו טברנה בלי אוזו — אפשר, אבל פחות כיף.</p>
+        <div class="gate__cta">
+          <button type="button" class="btn btn--gold" id="gateAdd">להוסיף תמונה</button>
+          <button type="button" class="btn btn--ghost" id="gateSkip">להמשיך בלי תמונה</button>
+        </div>
+      </div>
 
       <div class="done" id="done" hidden>
         <canvas class="done__confetti" id="confetti" aria-hidden="true"></canvas>

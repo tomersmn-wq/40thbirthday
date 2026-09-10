@@ -428,7 +428,7 @@
   loadGallery();
 
   /* ═════════════════════════════════════════════════════════════════
-     9. mandatory photo upload (multi-select)
+     9. optional photo upload (multi-select; skip is gated)
      ═════════════════════════════════════════════════════════════════ */
   var MAX_BYTES = 15 * 1024 * 1024;
   var MAX_DIM = 1600;
@@ -810,12 +810,56 @@
       setErr(uploadField, "רגע, התמונות עוד עולות…");
       return false;
     }
-    if (!photoUrl.value) {
-      setErr(uploadField, "חייבים תמונה שלנו מהעבר — זה חלק מהכיף 💙");
-      return false;
-    }
     clearErr(uploadField);
     return true;
+  }
+
+  function hasPhoto() {
+    return !!(photoUrl && photoUrl.value);
+  }
+
+  var photoGate = $("#photoGate");
+  var gateAdd = $("#gateAdd");
+  var gateSkip = $("#gateSkip");
+  var GATE_SKIP_LABEL = gateSkip ? gateSkip.textContent : "";
+
+  function setGateBusy(busy) {
+    if (gateAdd) gateAdd.disabled = busy;
+    if (gateSkip) {
+      gateSkip.disabled = busy;
+      gateSkip.textContent = busy ? "שולחים…" : GATE_SKIP_LABEL;
+    }
+  }
+  function showPhotoGate() {
+    if (!photoGate) return;
+    form.hidden = true;
+    photoGate.hidden = false;
+    photoGate.scrollIntoView({ block: "center", behavior: REDUCE ? "auto" : "smooth" });
+    if (gateAdd && gateAdd.focus) {
+      setTimeout(function () { gateAdd.focus({ preventScroll: true }); }, REDUCE ? 0 : 380);
+    }
+  }
+  function hidePhotoGate() {
+    if (!photoGate) return;
+    photoGate.hidden = true;
+    form.hidden = false;
+    setGateBusy(false);
+  }
+  if (gateAdd) {
+    gateAdd.addEventListener("click", function () {
+      hidePhotoGate();
+      if (uploadField) {
+        uploadField.classList.add("is-nudge");
+        uploadField.scrollIntoView({ block: "center", behavior: REDUCE ? "auto" : "smooth" });
+        setTimeout(function () { uploadField.classList.remove("is-nudge"); }, 1800);
+      }
+      if (fileInput && fileInput.focus) {
+        setTimeout(function () { fileInput.focus({ preventScroll: true }); }, REDUCE ? 0 : 380);
+      }
+    });
+  }
+  if (gateSkip) {
+    gateSkip.addEventListener("click", function () { send(); });
   }
 
   function status(msg, bad) {
@@ -856,14 +900,20 @@
         }
         return;
       }
+      if (!hasPhoto()) {
+        showPhotoGate();
+        return;
+      }
       send();
     });
   }
 
   function send() {
+    var fromGate = photoGate && !photoGate.hidden;
     submitBtn.disabled = true;
     submitTxt.textContent = "שולחים…";
     status("");
+    if (fromGate) setGateBusy(true);
 
     var payload = {};
     new FormData(form).forEach(function (v, k) {
@@ -874,6 +924,7 @@
     function bad(msg) {
       submitBtn.disabled = false;
       submitTxt.textContent = SUBMIT_LABEL;
+      if (fromGate) hidePhotoGate();
       status(msg || "משהו נתקע. נסו שוב, או התקשרו אלינו.", true);
     }
 
@@ -908,6 +959,7 @@
   function showDone() {
     var done = $("#done");
     form.hidden = true;
+    if (photoGate) photoGate.hidden = true;
     done.hidden = false;
     done.scrollIntoView({ block: "center", behavior: REDUCE ? "auto" : "smooth" });
     confetti($("#confetti"));

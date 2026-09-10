@@ -1307,6 +1307,64 @@ input:focus, textarea:focus, select:focus {
 .form__foot { font-size: .9rem; font-weight: 500; text-align: center; color: var(--ink-soft); min-height: 1.2rem; }
 .form__foot.is-bad { color: #A9421F; }
 
+.upload.is-nudge {
+  outline: 3px solid var(--gold);
+  outline-offset: 6px;
+  border-radius: var(--r);
+}
+
+/* skip-photo gate — looks blocked until they choose */
+.gate {
+  position: relative;
+  padding: clamp(2.4rem, 8vw, 3.6rem) clamp(1.2rem, 5vw, 2.2rem);
+  text-align: center;
+  background: linear-gradient(170deg, #152536 0%, var(--aegean-deep) 100%);
+  color: #fff;
+  overflow: hidden;
+}
+.gate__tape {
+  position: absolute;
+  inset-inline: -20%;
+  inset-block-start: 1.15rem;
+  height: 1.35rem;
+  background: repeating-linear-gradient(
+    -18deg,
+    var(--gold) 0 14px,
+    #1B2A3A 14px 28px
+  );
+  transform: rotate(-4deg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+  opacity: .92;
+}
+.gate__emoji { position: relative; font-size: 2.4rem; line-height: 1; margin-block-start: 1.4rem; }
+.gate__h {
+  position: relative;
+  font-family: var(--f-heb);
+  font-weight: 900;
+  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  color: var(--gold-lite);
+  margin-block: .7rem .45rem;
+}
+.gate__p {
+  position: relative;
+  max-width: 28rem;
+  margin-inline: auto;
+  color: rgba(255, 255, 255, .88);
+  line-height: 1.55;
+}
+.gate__cta {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+  justify-content: center;
+  margin-block-start: 1.6rem;
+}
+.gate__cta .btn--ghost {
+  border-color: rgba(255, 255, 255, .45);
+  color: #fff;
+}
+
 /* success panel */
 .done {
   position: relative;

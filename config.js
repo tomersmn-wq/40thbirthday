@@ -5,7 +5,7 @@
 ------------------------------------------------------------------ */
 
 window.SITE_CONFIG = {
-  // Cloudinary — powers the mandatory photo upload and the public gallery.
+  // Cloudinary — powers the optional photo upload and the public gallery.
   // Needs an *unsigned* upload preset, and "Resource list" unrestricted.
   cloudinary: {
     cloudName: "fgxnqd2s",
